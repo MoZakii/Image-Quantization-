@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        public struct Employee
+        {
+            public int R;
+            public int G;
+            public int B;
+        }
+
+        public static void Main()
+        {
+
+            Employee emp1, emp2, emp3, emp4, emp5, emp6 = new Employee();
+            HashSet<Employee> k = new HashSet<Employee>();
+            Dictionary<int, Employee> Nodes = new Dictionary<int, Employee>();
+
+            //emp1.R = 0;
+            //emp1.G = 0;
+            //emp1.B = 255;
+            //emp2.R = 255;
+            //emp2.G = 0;
+            //emp2.B = 0;
+            //emp3.R = 255;
+            //emp3.G = 115;
+            //emp3.B = 0;
+            //emp4.R = 190;
+            //emp4.G = 252;
+            //emp4.B = 81;
+            //emp5.R = 242;
+            //emp5.G = 255;
+            //emp5.B = 0;
+
+
+
+
+            //k.Add(emp1);
+            //k.Add(emp2);
+            //k.Add(emp3);
+            //k.Add(emp4);
+            //k.Add(emp5);
+
+            List<KeyValuePair<int, double>>[] Edges = new List<KeyValuePair<int, double>>[k.Count];
+
+            int i = 0;
+            foreach (var n in k)
+            {
+                Nodes.Add(i,n);
+                i++;
+            }
+            k.Clear();
+            for (int j = 0; j < i; j++)
+            {
+                Edges[j] = new List<KeyValuePair<int, double>>();
+            }
+            for (int j = 0; j< i; j++)
+            {
+                for (int l = 0; l <i; l++)
+                {
+                    KeyValuePair<int, double> helper = new KeyValuePair<int, double>(l, Math.Round(Math.Sqrt(Math.Pow(Nodes[j].R - Nodes[l].R, 2) + Math.Pow(Nodes[j].B - Nodes[l].B, 2) + Math.Pow(Nodes[j].G - Nodes[l].G, 2)),1));
+                    Edges[j].Add(helper);
+                }
+            }
+            //for (int j = 0; j < i; j++)
+            //{
+            //    foreach (var n in Edges[j])
+            //    {
+            //        Console.Write(n.Value + "   ");
+            //    }
+            //    Console.Write('\n');
+            //}
+        }
+    }
+}
