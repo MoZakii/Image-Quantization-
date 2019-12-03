@@ -274,21 +274,18 @@ namespace ImageQuantization
                     Edges[j, l] = Math.Round(Math.Sqrt(Math.Pow(Nodes[j].red - Nodes[l].red, 2) + Math.Pow(Nodes[j].blue - Nodes[l].blue, 2) + Math.Pow(Nodes[j].green - Nodes[l].green, 2)), 1);
                 }
             }
-
-            MinSpanTree(Edges, i + 1);
+            
+            MinSpanTree(Edges, i );
         }
-        
-        public static void MinSpanTree(double[,]Edg,int Vertices)
+        public static void MinSpanTree(double[,] Edges, int Vertices)
         {
-             mst(Edg,Vertices);
+            MST(Edges, Vertices);
 
-        }   
-
-        
-        public static int getmin(double []wt, bool []isvisted,int Vertics)
+        }
+        public static int Getmin(double[] wt, bool[] isvisted, int Vertics)
         {
             double minwt = double.MaxValue;
-            int minnode=0;
+            int minnode = 0;
             for (int v = 0; v < Vertics; ++v)
             {
                 if (isvisted[v] == false && wt[v] < minwt)
@@ -301,11 +298,11 @@ namespace ImageQuantization
             return minnode;
 
         }
-        public static void mst(double[,]graph , int V)
+        public static void MST(double[,] graph, int V)
         {
             int[] parent = new int[V];
             double[] wt = new double[V];
-            bool[] isvisited=new bool[V];
+            bool[] isvisited = new bool[V];
 
             for (int v = 0; v < V; ++v)
             {
@@ -320,35 +317,36 @@ namespace ImageQuantization
             for (int i = 0; i < V - 1; ++i)
             {
 
-                int u = getmin(wt , isvisited , V);
+                int u = Getmin(wt, isvisited, V);
 
                 isvisited[u] = true;
                 for (int j = 0; j < V; ++j)
                 {
-                    if ((graph[u,j] > 0) && (isvisited[j] == false) && (graph[u,j] < wt[j]))
+                    if ( (graph[u, j] > 0) && (isvisited[j] == false) && (graph[u, j] < wt[j]))
                     {
                         parent[j] = u;
-                        wt[j] = graph[u,j];
+                        wt[j] = graph[u, j];
                     }
                 }
 
             }
-            //double sum = 0;
+
+
+            double sum = 0;
+            for (int i = 1; i < V; i++)
+                sum += wt[i];
+            
+
             //for (int i = 1; i < V; ++i)
             //{
-            //    sum += wt[i];
+                sum =0;
 
             //    cout << parent[i] << "   " << i << "   " << wt[i] << endl;
             //}
             //cout << sum;
         }
 
-
-
-
-
-
     }
-
-
 }
+/////////////////////////////////////////////////////////////////////
+
