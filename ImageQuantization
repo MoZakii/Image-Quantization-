@@ -245,6 +245,7 @@ namespace ImageQuantization
         }
 
         //OUR CODE IS HERE LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL
+
         public static class Globals
         {
            public static double sum = 0;
@@ -254,28 +255,29 @@ namespace ImageQuantization
 
         public static List<KeyValuePair<int, double>>[] FillGraph(RGBPixel[,] ImageMatrix)
         {
-
-            HashSet<RGBPixel> k = new HashSet<RGBPixel>();
+            int k = 3;
+            RGBPixel [] Colors = new RGBPixel[k];
+            HashSet<RGBPixel> L = new HashSet<RGBPixel>();
             Dictionary<int, RGBPixel> Nodes = new Dictionary<int, RGBPixel>();
 
             for (int j = 0; j < GetHeight(ImageMatrix); j++)
             {
                 for (int l = 0; l < GetWidth(ImageMatrix); l++)
                 {
-                    k.Add(ImageMatrix[j, l]);
+                    L.Add(ImageMatrix[j, l]);
                 }
             }
 
-            double[,] Edges = new double[k.Count, k.Count];
-            List<KeyValuePair<int, double>>[] NewEdges;
+            double[,] Edges = new double[L.Count, L.Count];
+            List <KeyValuePair <int, double>>[] NewEdges;
             int i = 0;
-            foreach (var n in k)
+            foreach (var n in L)
             {
                 Nodes.Add(i, n);
                 i++;
             }
-            Globals.distinct = k.Count;
-            k.Clear();
+            Globals.distinct = L.Count;
+            L.Clear();
             for (int j = 0; j < i; j++)
             {
                 for (int l = 0; l < i; l++)
@@ -285,6 +287,7 @@ namespace ImageQuantization
             }
             NewEdges = MST(Edges, i);
             NewEdges = Clustering(NewEdges, i);
+            Colors = Pallete(NewEdges, k, Nodes);
             return NewEdges;
         }
         public static List<KeyValuePair<int, double>>[] Clustering(List<KeyValuePair<int, double>>[] Edg, int V)
@@ -404,5 +407,42 @@ namespace ImageQuantization
             return Edges;
   
         }
+
+        public static RGBPixel[] Pallete(List<KeyValuePair<int, double>>[] NewEdges, int k, Dictionary<int, RGBPixel> Nodes)
+        {
+            RGBPixel[] Colors = new RGBPixel[k];
+            bool[] visited = new bool[NewEdges.Length];
+            int j = 0;
+            for (int i = 0; i < NewEdges.Length; i++)
+            {
+                visited[i] = false;
+            }
+            for (int i = 0; i < NewEdges.Length; i++)
+            {
+                if (NewEdges[i].Count != 0)
+                {
+                    foreach (var n in NewEdges[i])
+                    {
+                        
+                        if (visited[i] != false)
+                        {
+                            visited[i] = true;
+                        }
+                    }
+                }
+                else
+                {
+                    if (visited[i] == false)
+                    {
+                        Colors[j] = Nodes[i];
+                        j++;
+                    }
+                }
+            }
+            return Colors;
+
+        }
     }
+
+
 }
