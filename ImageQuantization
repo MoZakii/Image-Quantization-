@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
@@ -248,17 +249,19 @@ namespace ImageQuantization
 
         public static class Globals
         {
-           public static double sum = 0;
-           public static int distinct = 0;
+            public static double sum = 0;
+            public static int distinct = 0;
         }
 
 
         public static List<KeyValuePair<int, double>>[] FillGraph(RGBPixel[,] ImageMatrix)
         {
-            int k = 3;
-            RGBPixel [] Colors = new RGBPixel[k];
+            int k = 3; // temporary k initialized by 3
+            RGBPixel[] Colors = new RGBPixel[k];
             HashSet<RGBPixel> L = new HashSet<RGBPixel>();
             Dictionary<int, RGBPixel> Nodes = new Dictionary<int, RGBPixel>();
+
+            Hashtable my_hashtable1 = new Hashtable();
 
             for (int j = 0; j < GetHeight(ImageMatrix); j++)
             {
@@ -269,7 +272,7 @@ namespace ImageQuantization
             }
 
             double[,] Edges = new double[L.Count, L.Count];
-            List <KeyValuePair <int, double>>[] NewEdges;
+            List<KeyValuePair<int, double>>[] NewEdges;
             int i = 0;
             foreach (var n in L)
             {
@@ -287,12 +290,12 @@ namespace ImageQuantization
             }
             NewEdges = MST(Edges, i);
             NewEdges = Clustering(NewEdges, i);
-            Colors = Pallete(NewEdges, k, Nodes);
+            Colors = Pallete(NewEdges, k, Nodes); // We don't have k yet
             return NewEdges;
         }
         public static List<KeyValuePair<int, double>>[] Clustering(List<KeyValuePair<int, double>>[] Edg, int V)
         {
-            List <KeyValuePair<int, double>>[] tempEdges = new List<KeyValuePair<int, double>>[V];
+            List<KeyValuePair<int, double>>[] tempEdges = new List<KeyValuePair<int, double>>[V];
             double[] arr = new double[V - 1];
             for (int j = 0; j < V; j++)
             {
@@ -392,7 +395,7 @@ namespace ImageQuantization
             Globals.sum = 0;
             for (int j = 0; j < V; j++)
             {
-               Globals.sum += wt[j];
+                Globals.sum += wt[j];
             }
             Globals.sum = Math.Round(Globals.sum, 2);
             List<KeyValuePair<int, double>>[] Edges = new List<KeyValuePair<int, double>>[V];
@@ -405,17 +408,22 @@ namespace ImageQuantization
                 Edges[l].Add(new KeyValuePair<int, double>(parent[l], wt[l]));
             }
             return Edges;
-  
+
         }
 
         public static RGBPixel[] Pallete(List<KeyValuePair<int, double>>[] NewEdges, int k, Dictionary<int, RGBPixel> Nodes)
         {
-            RGBPixel[] Colors = new RGBPixel[k];
-            bool[] visited = new bool[NewEdges.Length];
+            List<RGBPixel> [] Colors = new List<RGBPixel>[k];
+            RGBPixel [] Representative = new RGBPixel[k];
+            int[] visited = new int[NewEdges.Length];
             int j = 0;
             for (int i = 0; i < NewEdges.Length; i++)
             {
-                visited[i] = false;
+                visited[i] = -1;
+            }
+            for (int i = 0; i < k; i++)
+            {
+                Colors[i] = new List<RGBPixel>();
             }
             for (int i = 0; i < NewEdges.Length; i++)
             {
@@ -423,23 +431,62 @@ namespace ImageQuantization
                 {
                     foreach (var n in NewEdges[i])
                     {
-                        
-                        if (visited[i] != false)
+
+                        if (visited[i] == -1)
                         {
-                            visited[i] = true;
+                            if (visited[n.Key] == -1)
+                            {
+                                visited[i] = j;
+                                visited[n.Key] = j;
+                                Colors[j].Add(Nodes[i]);
+                                Colors[j].Add(Nodes[n.Key]);
+                                j++;
+                            }
+                            else
+                            {
+                                Colors[visited[n.Key]].Add(Nodes[i]);
+                                visited[i] = visited[n.Key];
+                            }
+                        }
+                        else
+                        {
+                            Colors[visited[i]].Add(Nodes[n.Key]);
+                            visited[n.Key] = visited[i];
                         }
                     }
                 }
                 else
                 {
-                    if (visited[i] == false)
+                    if (visited[i] == -1)
                     {
-                        Colors[j] = Nodes[i];
+                        Colors[j].Add(Nodes[i]);
+                        visited[i] = j;
                         j++;
                     }
                 }
             }
-            return Colors;
+            double R, G, B;
+            for (int i = 0; i < k; i++)
+            {
+                R = 0; G = 0; B = 0;
+
+                foreach (var n in Colors[i])
+                {
+                    R += n.red;
+                    G += n.green;
+                    B += n.blue;
+                }
+
+                R /= Colors[i].Count;
+                G /= Colors[i].Count;
+                B /= Colors[i].Count;
+
+                Representative[i].red = (byte)R;
+                Representative[i].green = (byte)G;
+                Representative[i].blue = (byte)B;
+
+            }
+            return Representative;
 
         }
     }
