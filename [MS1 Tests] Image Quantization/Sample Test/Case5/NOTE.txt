@@ -1,0 +1,3 @@
+the MST contains edges with same weights
+MST sum should be 441.7
+Final O/P may differ from one to another (according to the selected edges)
